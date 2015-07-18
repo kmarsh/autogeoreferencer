@@ -1,6 +1,6 @@
 # autogeoreferencer
 
-An automated georeferencer based on Li and Brigg's 2006 paper "Automated
+An automated georeferencer based on Li and Briggs' 2006 paper "Automated
 Georeferencing Based on Topological Point Pattern Matching" which relies on the
 topology of point patterns (TPP) to capture the spatial information of a point
 set.
@@ -18,7 +18,7 @@ set.
 I'm in the very beginning stages of converting the papers pseudocode and math
 into (hopefully) working Python.
 
-Please help!
+Please help! Pull requests welcome.
 
 ## Disclaimer
 

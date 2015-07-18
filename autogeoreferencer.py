@@ -2,6 +2,9 @@ from scipy import spatial
 from scipy.spatial import distance
 import numpy as np
 import math
+import pickle
+import hashlib
+import os.path
 
 def length(v):
   return np.sqrt(np.dot(v, v))
@@ -99,10 +102,16 @@ def find_candidate_cpps(raster_intersections, vector_intersections, delta_r_tole
 
     # for each point in v in V do
     #   compute tpp(v) and sort it based on the polar coordinates
-    # TODO Precompute, store, and load here
     tpp_vi = {}
-    for index, i in enumerate(vector_intersections):
-        tpp_vi[index] = tpp(vector_intersections, index, True)
+
+    cache_file = os.path.join("cache", hashlib.sha1(vector_intersections).hexdigest() + ".p")
+    if os.path.isfile(cache_file):
+        tpp_vi = pickle.load(open(cache_file, "rb"))
+    else:
+        for index, i in enumerate(vector_intersections):
+            tpp_vi[index] = tpp(vector_intersections, index, True)
+
+        pickle.dump(tpp_vi, open(cache_file, "wb"))
 
     # for each v in V do
     #   if tpp(r) \subseteq tpp(v) then

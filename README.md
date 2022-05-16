@@ -15,7 +15,7 @@ set.
 
 ## Progress
 
-I'm in the very beginning stages of converting the papers pseudocode and math
+I'm in the very beginning stages of converting the paper's pseudocode and math from steps 3-4 using manually-collected points for input steps 1 and 2
 into (hopefully) working Python.
 
 Please help! Pull requests welcome.
@@ -23,5 +23,6 @@ Please help! Pull requests welcome.
 ## Disclaimer
 
 I have no relation to the original authors or claim any copyright to their methods.
+
 I just have a bunch of scanned maps I need to georeference and not much patience
 to hand-select GCPs on my own.

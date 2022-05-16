@@ -6,6 +6,8 @@ import pickle
 import hashlib
 import os.path
 
+CACHE_VECTOR_TPP = False
+
 def length(v):
   return np.sqrt(np.dot(v, v))
 
@@ -58,21 +60,30 @@ def tpp(coordinateArray, anchorPointIndex, sort_by_polar_coordinates = True):
 
     tree = spatial.KDTree(coordinateArray)
     qpoint = coordinateArray[anchorPointIndex]
-    nearest = tree.query(qpoint, 2)
+    nearestDistances, nearestIndices = tree.query(qpoint, 2)
 
-    # HACK but if we get the same point back consider the next point as the closest
+    # print("nearest", nearestDistances)
+
+    # The 0th returned is the query point, the second is the nearest neighbor
     closestIndex = 1
 
-    d_i = nearest[0][closestIndex] # distance from anchor point to nearest point
-    nearestCoordinates = coordinateArray[nearest[1][closestIndex]] # nearest point coordinates from anchor point
+    # distance from anchor point to nearest point
+    d_i = nearestDistances[closestIndex]
+
+    # nearest point coordinates from anchor point
+    nearestCoordinates = coordinateArray[nearestIndices[closestIndex]]
+
+    # print("nearestCoordinates to ", qpoint, nearestCoordinates)
 
     for index, j in enumerate(coordinateArray):
         if (index != anchorPointIndex and j[0] != nearestCoordinates[0] and j[1] != nearestCoordinates[1]):
             try:
-                d_ij = distance.euclidean(qpoint, j) # distance between anchor point and j
+                # distance between anchor point and j
+                d_ij = distance.euclidean(qpoint, j)
                 r_ij = d_ij / d_i
 
-                theta_ij = angle(j, nearestCoordinates) # Angle from vector vi vi' to vector vi vj
+                # Angle from vector vi vi' to vector vi vj
+                theta_ij = angle(j, nearestCoordinates)
 
                 x_prime_j = r_ij * math.cos(theta_ij)
                 y_prime_j = r_ij * math.sin(theta_ij)
@@ -105,7 +116,7 @@ def find_candidate_cpps(raster_intersections, vector_intersections, delta_r_tole
     tpp_vi = {}
 
     cache_file = os.path.join("cache", hashlib.sha1(vector_intersections).hexdigest() + ".p")
-    if os.path.isfile(cache_file):
+    if CACHE_VECTOR_TPP and os.path.isfile(cache_file):
         tpp_vi = pickle.load(open(cache_file, "rb"))
     else:
         for index, i in enumerate(vector_intersections):

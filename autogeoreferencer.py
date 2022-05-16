@@ -6,7 +6,7 @@ import pickle
 import hashlib
 import os.path
 
-CACHE_VECTOR_TPP = False
+CACHE_VECTOR_TPP = True
 
 def length(v):
   return np.sqrt(np.dot(v, v))
@@ -108,8 +108,6 @@ def find_candidate_cpps(raster_intersections, vector_intersections, delta_r_tole
 
     # compute tpp(r) in R and sort based on polar coordinates
     tpp_r = tpp(raster_intersections, r_index, True)
-
-    print(tpp_r)
 
     # for each point in v in V do
     #   compute tpp(v) and sort it based on the polar coordinates

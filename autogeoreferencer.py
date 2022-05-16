@@ -104,42 +104,42 @@ def find_candidate_cpps(raster_intersections, vector_intersections, delta_r_tole
     ccm = []
 
     # select an anchor point r in R such that n(r) in R also is r's nearest neighbor in the image
-    r_index = 0
+    for r_index, _ in enumerate(raster_intersections):
+        print(r_index, raster_intersections[r_index])
 
-    # compute tpp(r) in R and sort based on polar coordinates
-    tpp_r = tpp(raster_intersections, r_index, True)
+        # compute tpp(r) in R and sort based on polar coordinates
+        tpp_r = tpp(raster_intersections, r_index, True)
 
-    # for each point in v in V do
-    #   compute tpp(v) and sort it based on the polar coordinates
-    tpp_vi = {}
+        # for each point in v in V do
+        #   compute tpp(v) and sort it based on the polar coordinates
+        tpp_vi = {}
 
-    cache_file = os.path.join("cache", hashlib.sha1(vector_intersections).hexdigest() + ".p")
-    if CACHE_VECTOR_TPP and os.path.isfile(cache_file):
-        tpp_vi = pickle.load(open(cache_file, "rb"))
-    else:
-        for index, i in enumerate(vector_intersections):
-            tpp_vi[index] = tpp(vector_intersections, index, True)
+        cache_file = os.path.join("cache", hashlib.sha1(vector_intersections).hexdigest() + ".p")
+        if CACHE_VECTOR_TPP and os.path.isfile(cache_file):
+            tpp_vi = pickle.load(open(cache_file, "rb"))
+        else:
+            for index, i in enumerate(vector_intersections):
+                tpp_vi[index] = tpp(vector_intersections, index, True)
 
-        pickle.dump(tpp_vi, open(cache_file, "wb"))
+            pickle.dump(tpp_vi, open(cache_file, "wb"))
 
-    # for each v in V do
-    #   if tpp(r) \subseteq tpp(v) then
-    #     set acm to be the set of matching point pairs between tpp(r) and tpp(v)
-    #     if (there are enough point pairs in acm) then
-    #       add acm to ccm
-    for index, i in enumerate(vector_intersections):
-        r_i, theta_i = cart2pol(*tpp_r[0])
-
-        r_j, theta_j = cart2pol(*tpp_vi[index][0])
-
-        delta_r = r_i - r_j
-        delta_theta = theta_i - theta_j
-
+        # for each v in V do
+        #   if tpp(r) \subseteq tpp(v) then
+        #     set acm to be the set of matching point pairs between tpp(r) and tpp(v)
+        #     if (there are enough point pairs in acm) then
+        #       add acm to ccm
         acm = []
-        if delta_r <= delta_r_tolerance and delta_theta <= delta_theta_tolerance:
-            print([raster_intersections[r_index], vector_intersections[index]], delta_r, delta_theta)
-#             acm.append([raster_intersections[r_index], vector_intersections[index]])
-#             if (len(acm) > 3): # TODO verify?
-#                 ccm.append(acm)
+        for index, i in enumerate(vector_intersections):
+            r_i, theta_i = cart2pol(*tpp_r[0])
+            r_j, theta_j = cart2pol(*tpp_vi[index][0])
+
+            delta_r = r_i - r_j
+            delta_theta = theta_i - theta_j
+
+            if delta_r <= delta_r_tolerance and delta_theta <= delta_theta_tolerance:
+                acm.append([raster_intersections[r_index], vector_intersections[index]])
+
+        if (len(acm) > 6):
+            ccm.append(acm)
 
     return ccm
